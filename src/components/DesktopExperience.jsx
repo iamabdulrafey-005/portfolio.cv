@@ -14,7 +14,10 @@ import {
   Flame, 
   Zap,
   Globe,
-  Maximize2
+  Maximize2,
+  Minimize2,
+  ArrowDown,
+  Smartphone
 } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
 import { sound } from '../utils/audio';
@@ -30,7 +33,8 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
   const hudIndicatorRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('surgeticket');
-  const [zoomStage, setZoomStage] = useState('emerging'); // emerging | inside | zoomed-out
+  const [zoomStage, setZoomStage] = useState('emerging');
+  const [isZoomedManual, setIsZoomedManual] = useState(false);
 
   const { projects, personal } = portfolioData;
   const surgeProject = projects.find(p => p.id === 'surgeticket');
@@ -44,13 +48,12 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
 
     if (!container || !monitor) return;
 
-    // Create GSAP ScrollTrigger timeline with pinning
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=2800',
+          end: '+=2400',
           scrub: 1.2,
           pin: true,
           anticipatePin: 1,
@@ -92,7 +95,7 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
         "<"
       );
 
-      // 2. Seamless Zoom In: Visitor "Steps Inside" the monitor (25% -> 50%)
+      // 2. Seamless Zoom In: Visitor Steps Inside monitor (25% -> 50%)
       tl.to(monitor, {
         scale: 3.4,
         y: 0,
@@ -116,7 +119,7 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
       // 3. Pinned Full View Inside the Screen (50% -> 70%)
       tl.to(monitor, {
         scale: 3.4,
-        duration: 1.8 // hold inside view for reading/interaction
+        duration: 1.8
       });
 
       // 4. Zoom out / Reversal back into Desktop Monitor (70% -> 100%)
@@ -145,6 +148,44 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
     return () => ctx.revert();
   }, []);
 
+  const manualZoomIn = () => {
+    sound.playWhoosh();
+    setIsZoomedManual(true);
+    gsap.to(monitorFrameRef.current, {
+      scale: 3.4,
+      duration: 1.2,
+      ease: 'power3.inOut'
+    });
+    gsap.to(monitorStandRef.current, {
+      opacity: 0,
+      y: 200,
+      duration: 0.8
+    });
+  };
+
+  const manualZoomOut = () => {
+    sound.playClick();
+    setIsZoomedManual(false);
+    gsap.to(monitorFrameRef.current, {
+      scale: 1,
+      duration: 1.2,
+      ease: 'power3.out'
+    });
+    gsap.to(monitorStandRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8
+    });
+  };
+
+  const jumpToPhone = () => {
+    sound.playWhoosh();
+    const phoneEl = document.getElementById('mobile-experience');
+    if (phoneEl) {
+      phoneEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section 
       id="desktop-experience" 
@@ -158,7 +199,7 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
       {/* Floating HUD Indicator */}
       <div 
         ref={hudIndicatorRef} 
-        className="absolute top-20 z-40 px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/40 backdrop-blur-md shadow-xl flex items-center gap-3 pointer-events-none transition-all duration-300"
+        className="absolute top-16 sm:top-20 z-40 px-4 sm:px-5 py-2 rounded-full bg-slate-900/90 border border-cyan-500/40 backdrop-blur-md shadow-xl flex items-center gap-3 transition-all duration-300"
       >
         <div className="flex h-2.5 w-2.5 relative">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -168,13 +209,42 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
           <span className="text-cyan-300 font-semibold uppercase tracking-wider">
             Experience 01: Desktop Station
           </span>
-          <span className="text-slate-500">|</span>
-          <span className="text-slate-300">
-            {zoomStage === 'emerging' && "Scroll down to zoom inside virtual screen"}
+          <span className="text-slate-500 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline">
+            {zoomStage === 'emerging' && "Scroll or click buttons to zoom inside"}
             {zoomStage === 'inside' && "✨ You are now inside the Desktop Workspace"}
-            {zoomStage === 'reversing' && "Scrolling will transition to Mobile view"}
+            {zoomStage === 'reversing' && "Next: Transitioning to 3D Smartphone"}
           </span>
         </div>
+      </div>
+
+      {/* Direct Interactive Control Buttons */}
+      <div className="absolute bottom-6 sm:bottom-8 z-40 flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-slate-900/90 border border-cyan-500/30 backdrop-blur-md shadow-2xl">
+        {isZoomedManual ? (
+          <button
+            onClick={manualZoomOut}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-mono border border-cyan-500/30 transition cursor-pointer"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Zoom Out (Monitor)</span>
+          </button>
+        ) : (
+          <button
+            onClick={manualZoomIn}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-mono border border-cyan-500/30 transition cursor-pointer"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span>Zoom Inside Screen</span>
+          </button>
+        )}
+
+        <button
+          onClick={jumpToPhone}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-purple-600/30 transition cursor-pointer"
+        >
+          <Smartphone className="w-3.5 h-3.5" />
+          <span>Next: 3D Smartphone Animation →</span>
+        </button>
       </div>
 
       {/* 3D Perspective Stage Container */}
@@ -402,12 +472,9 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
 
         {/* Realistic Aluminum Monitor Stand */}
         <div ref={monitorStandRef} className="flex flex-col items-center pointer-events-none -mt-1 select-none">
-          {/* Vertical Arm */}
           <div className="w-16 h-14 bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 shadow-xl border-x border-slate-600 flex items-center justify-center">
-            {/* Cable Pass-Through Hole */}
             <div className="w-5 h-8 rounded-full bg-slate-950 border border-slate-600/60 shadow-inner"></div>
           </div>
-          {/* Stand Base */}
           <div className="w-48 h-3.5 rounded-t-lg bg-gradient-to-b from-slate-600 via-slate-500 to-slate-700 shadow-[0_12px_20px_rgba(0,0,0,0.8)] border-t border-white/20"></div>
         </div>
 

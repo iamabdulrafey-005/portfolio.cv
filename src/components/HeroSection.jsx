@@ -66,13 +66,24 @@ export default function HeroSection({ onOpenResume }) {
             </p>
 
             {/* Call To Actions */}
-            <div className="flex flex-wrap items-center gap-4 mb-10 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-3 mb-10 w-full sm:w-auto">
               <button
                 onClick={scrollToDesktop}
-                className="group relative inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 transition-all duration-300 hover:scale-[1.02]"
+                className="group relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
               >
-                <span>Enter 3D Experience</span>
+                <span>3D Desktop Monitor</span>
                 <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
+              </button>
+
+              <button
+                onClick={() => {
+                  sound.playWhoosh();
+                  const el = document.getElementById('mobile-experience');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-600/25 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+              >
+                <span>📱 3D Smartphone Animation</span>
               </button>
 
               <a
@@ -80,19 +91,10 @@ export default function HeroSection({ onOpenResume }) {
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => sound.playClick()}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/40 transition-all duration-300 hover:text-white"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-medium text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/40 transition-all duration-300 hover:text-white"
               >
                 <GithubIcon className="w-4 h-4 text-cyan-400" />
                 <span className="font-mono text-sm">@{personal.githubUsername}</span>
-              </a>
-
-              <a
-                href="#contact"
-                onClick={() => sound.playClick()}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-medium text-slate-400 hover:text-cyan-300 transition-colors"
-              >
-                <Send className="w-4 h-4" />
-                <span>Get in touch</span>
               </a>
             </div>
 

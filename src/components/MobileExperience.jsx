@@ -14,7 +14,11 @@ import {
   Code,
   Sparkles,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Maximize2,
+  Minimize2,
+  RotateCw,
+  Play
 } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
 import { sound } from '../utils/audio';
@@ -28,6 +32,8 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
 
   const [activeMobileTab, setActiveMobileTab] = useState('feed');
   const [zoomStage, setZoomStage] = useState('emerging');
+  const [isAnimatingManual, setIsAnimatingManual] = useState(false);
+  const [isZoomedManual, setIsZoomedManual] = useState(false);
 
   const { projects, personal } = portfolioData;
   const surgeProject = projects.find(p => p.id === 'surgeticket');
@@ -45,7 +51,7 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=2800',
+          end: '+=2400',
           scrub: 1.2,
           pin: true,
           anticipatePin: 1,
@@ -66,10 +72,10 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
       tl.fromTo(phone,
         {
           scale: 0.65,
-          rotateY: 24,
-          rotateX: 14,
-          y: 140,
-          opacity: 0.4
+          rotateY: 28,
+          rotateX: 16,
+          y: 160,
+          opacity: 0.3
         },
         {
           scale: 1,
@@ -100,7 +106,7 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
       // 3. Pinned Full View Inside Mobile Screen (50% -> 70%)
       tl.to(phone, {
         scale: 2.7,
-        duration: 1.8 // hold inside view for interactive feel
+        duration: 1.8
       });
 
       // 4. Smooth Reversal back into Handheld Phone frame (70% -> 100%)
@@ -123,6 +129,108 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
     return () => ctx.revert();
   }, []);
 
+  // Direct Interactive Animation Controls
+  const animateZoomIn = () => {
+    sound.playWhoosh();
+    setIsAnimatingManual(true);
+    setIsZoomedManual(true);
+    gsap.to(phoneFrameRef.current, {
+      scale: 2.7,
+      rotateY: 0,
+      rotateX: 0,
+      y: 0,
+      duration: 1.2,
+      ease: 'power3.inOut',
+      onComplete: () => setIsAnimatingManual(false)
+    });
+  };
+
+  const animateZoomOut = () => {
+    sound.playClick();
+    setIsAnimatingManual(true);
+    setIsZoomedManual(false);
+    gsap.to(phoneFrameRef.current, {
+      scale: 1,
+      rotateY: 0,
+      rotateX: 0,
+      y: 0,
+      duration: 1.2,
+      ease: 'power3.out',
+      onComplete: () => setIsAnimatingManual(false)
+    });
+  };
+
+  const animate3DRotate = () => {
+    sound.playWhoosh();
+    setIsAnimatingManual(true);
+    const tl = gsap.timeline({
+      onComplete: () => setIsAnimatingManual(false)
+    });
+    tl.to(phoneFrameRef.current, {
+      rotateY: -35,
+      rotateX: 15,
+      scale: 1.05,
+      duration: 0.8,
+      ease: 'power2.inOut'
+    })
+    .to(phoneFrameRef.current, {
+      rotateY: 35,
+      rotateX: -10,
+      duration: 1.2,
+      ease: 'power2.inOut'
+    })
+    .to(phoneFrameRef.current, {
+      rotateY: 0,
+      rotateX: 0,
+      scale: 1,
+      duration: 0.8,
+      ease: 'power2.out'
+    });
+  };
+
+  const playFullWalkthrough = () => {
+    sound.playSuccess();
+    setIsAnimatingManual(true);
+    const tl = gsap.timeline({
+      onComplete: () => setIsAnimatingManual(false)
+    });
+
+    // 1. Entrance 3D rotation
+    tl.to(phoneFrameRef.current, {
+      rotateY: 25,
+      rotateX: 12,
+      scale: 0.9,
+      duration: 0.7,
+      ease: 'power2.out'
+    })
+    // 2. Center face
+    .to(phoneFrameRef.current, {
+      rotateY: 0,
+      rotateX: 0,
+      scale: 1,
+      duration: 0.6,
+      ease: 'power2.out'
+    })
+    // 3. Zoom into screen
+    .to(phoneFrameRef.current, {
+      scale: 2.7,
+      duration: 1.4,
+      ease: 'power3.inOut'
+    })
+    // 4. Switch tab inside phone
+    .call(() => setActiveMobileTab('surge'))
+    // 5. Hold view
+    .to({}, { duration: 1.2 })
+    // 6. Switch tab back
+    .call(() => setActiveMobileTab('feed'))
+    // 7. Zoom out back to handheld
+    .to(phoneFrameRef.current, {
+      scale: 1,
+      duration: 1.2,
+      ease: 'power3.out'
+    });
+  };
+
   return (
     <section 
       id="mobile-experience" 
@@ -136,7 +244,7 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
       {/* Floating HUD Indicator */}
       <div 
         ref={hudIndicatorRef} 
-        className="absolute top-20 z-40 px-5 py-2 rounded-full bg-slate-900/90 border border-purple-500/40 backdrop-blur-md shadow-xl flex items-center gap-3 pointer-events-none transition-all duration-300"
+        className="absolute top-16 sm:top-20 z-40 px-4 sm:px-5 py-2 rounded-full bg-slate-900/90 border border-purple-500/40 backdrop-blur-md shadow-xl flex items-center gap-3 transition-all duration-300"
       >
         <div className="flex h-2.5 w-2.5 relative">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
@@ -144,15 +252,56 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
           <span className="text-purple-300 font-semibold uppercase tracking-wider">
-            Experience 02: Mobile Device
+            Experience 02: 3D Smartphone
           </span>
-          <span className="text-slate-500">|</span>
-          <span className="text-slate-300">
-            {zoomStage === 'emerging' && "Scroll to zoom into mobile-optimized layout"}
+          <span className="text-slate-500 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline">
+            {zoomStage === 'emerging' && "Scroll or click buttons below to animate phone zoom"}
             {zoomStage === 'inside' && "📱 Full-screen responsive mobile experience"}
             {zoomStage === 'reversing' && "Scroll further for deep-dive portfolio sections"}
           </span>
         </div>
+      </div>
+
+      {/* Interactive Animation Control Bar (Direct One-Click Animation for Teacher / Evaluator) */}
+      <div className="absolute bottom-6 sm:bottom-8 z-40 flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-slate-900/90 border border-purple-500/30 backdrop-blur-md shadow-2xl">
+        <button
+          onClick={playFullWalkthrough}
+          disabled={isAnimatingManual}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-semibold hover:from-purple-400 hover:to-indigo-500 transition shadow-md shadow-purple-500/20 disabled:opacity-50 cursor-pointer"
+        >
+          <Play className="w-3.5 h-3.5 fill-current" />
+          <span>Play 3D Animation</span>
+        </button>
+
+        {isZoomedManual ? (
+          <button
+            onClick={animateZoomOut}
+            disabled={isAnimatingManual}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 text-xs font-mono border border-purple-500/30 transition disabled:opacity-50 cursor-pointer"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Zoom Out (Handheld)</span>
+          </button>
+        ) : (
+          <button
+            onClick={animateZoomIn}
+            disabled={isAnimatingManual}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-mono border border-cyan-500/30 transition disabled:opacity-50 cursor-pointer"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span>Zoom In (Fill Viewport)</span>
+          </button>
+        )}
+
+        <button
+          onClick={animate3DRotate}
+          disabled={isAnimatingManual}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-white/10 transition disabled:opacity-50 cursor-pointer"
+        >
+          <RotateCw className="w-3.5 h-3.5 text-purple-400" />
+          <span className="hidden sm:inline">Orbit 3D Angle</span>
+        </button>
       </div>
 
       {/* 3D Perspective Stage Container */}
@@ -161,15 +310,13 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
         {/* Realistic Smartphone (Titanium Flagship Frame) */}
         <div 
           ref={phoneFrameRef}
-          className="relative w-[310px] sm:w-[340px] h-[640px] rounded-[50px] p-3 bg-gradient-to-b from-slate-600 via-slate-800 to-slate-900 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9),0_0_45px_rgba(139,92,246,0.2)] border-2 border-slate-500/80 preserve-3d"
+          className="relative w-[310px] sm:w-[340px] h-[640px] rounded-[50px] p-3 bg-gradient-to-b from-slate-600 via-slate-800 to-slate-900 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9),0_0_45px_rgba(139,92,246,0.25)] border-2 border-slate-500/80 preserve-3d"
           style={{ transformOrigin: 'center center' }}
         >
           {/* Side Buttons (Simulated Titanium Hardware) */}
-          {/* Left: Action Button & Volume */}
           <div className="absolute -left-[5px] top-28 w-[3px] h-8 bg-slate-400 rounded-l-md"></div>
           <div className="absolute -left-[5px] top-40 w-[3px] h-12 bg-slate-400 rounded-l-md"></div>
           <div className="absolute -left-[5px] top-56 w-[3px] h-12 bg-slate-400 rounded-l-md"></div>
-          {/* Right: Power / Lock Button */}
           <div className="absolute -right-[5px] top-36 w-[3px] h-16 bg-slate-400 rounded-r-md"></div>
 
           {/* Inner Phone Display */}
@@ -177,7 +324,6 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
             
             {/* Mobile Status Bar with Dynamic Island */}
             <div className="h-11 px-6 bg-slate-950 flex items-center justify-between text-white text-[11px] font-medium z-30 shrink-0">
-              {/* Clock */}
               <span className="font-semibold tracking-tight">9:41</span>
               
               {/* Dynamic Island Pill */}
