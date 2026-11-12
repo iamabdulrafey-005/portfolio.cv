@@ -1,0 +1,2 @@
+# Automatically serve the bundled portfolio when visiting http://localhost/portfolio.cv/
+DirectoryIndex portfolio.html index.html
