@@ -23,6 +23,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
+import { profileImageBase64 } from '../assets/profileImage';
 import { sound } from '../utils/audio';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -439,10 +440,12 @@ export default function MobileExperience({ onOpenResume, onOpenTerminal }) {
               {/* Mobile App Header */}
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 via-blue-500 to-purple-600 p-[1.5px]">
-                    <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-xs font-bold text-cyan-400">
-                      AR
-                    </div>
+                  <div className="w-9 h-9 rounded-full overflow-hidden p-[1.5px] bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 shadow-md">
+                    <img 
+                      src={profileImageBase64} 
+                      alt="Abdul Rafey" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
                   </div>
                   <div>
                     <p className="text-xs font-extrabold leading-tight">Abdul Rafey</p>

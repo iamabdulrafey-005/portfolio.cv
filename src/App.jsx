@@ -10,12 +10,14 @@ import ContactSection from './components/ContactSection';
 import InteractiveTerminal from './components/InteractiveTerminal';
 import ResumeModal from './components/ResumeModal';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import CyberCanvas4D from './components/CyberCanvas4D';
 import Footer from './components/Footer';
 import { sound } from './utils/audio';
 
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [isGameActive, setIsGameActive] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
   const [theme, setTheme] = useState('cyber');
 
@@ -34,17 +36,25 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-slate-100 flex flex-col selection:bg-[var(--primary)]/30 selection:text-cyan-200 transition-colors duration-500">
+    <div className="relative min-h-screen bg-[var(--bg-base)] text-slate-100 flex flex-col selection:bg-[var(--primary)]/30 selection:text-cyan-200 transition-colors duration-500 overflow-x-hidden">
       
+      {/* 4D Hyperspace & Interactive Game Canvas Background */}
+      <CyberCanvas4D 
+        isGameActive={isGameActive} 
+        onCloseGame={() => setIsGameActive(false)} 
+      />
+
       {/* Global Navigation Header */}
       <Navbar 
         onOpenResume={() => setIsResumeOpen(true)}
         onOpenTerminal={() => setIsTerminalOpen(true)}
+        onToggleGame={() => setIsGameActive(!isGameActive)}
+        isGameActive={isGameActive}
         soundActive={soundActive}
         onToggleSound={handleToggleSound}
       />
 
-      {/* 1. Cinematic Hero Section */}
+      {/* 1. Cinematic Hero Section with Abdul Rafey's Real Portrait */}
       <HeroSection 
         onOpenResume={() => setIsResumeOpen(true)}
       />

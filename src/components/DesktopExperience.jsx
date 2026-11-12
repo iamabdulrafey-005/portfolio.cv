@@ -21,6 +21,7 @@ import {
   Activity
 } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
+import { profileImageBase64 } from '../assets/profileImage';
 import { sound } from '../utils/audio';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -408,8 +409,12 @@ export default function DesktopExperience({ onOpenResume, onOpenTerminal }) {
               {/* Header inside desktop */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center font-black text-cyan-400 text-sm shadow-md">
-                    AR
+                  <div className="w-10 h-10 rounded-full overflow-hidden p-[1.5px] bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 shadow-md">
+                    <img 
+                      src={profileImageBase64} 
+                      alt="Abdul Rafey" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
                   </div>
                   <div>
                     <h3 className="text-sm font-extrabold text-white tracking-wide">

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, FileText, Menu, X, Sparkles, Terminal } from 'lucide-react';
+import { Volume2, VolumeX, FileText, Menu, X, Sparkles, Terminal, Gamepad2 } from 'lucide-react';
+import { profileImageBase64 } from '../assets/profileImage';
 import { sound } from '../utils/audio';
 
-export default function Navbar({ onOpenResume, onOpenTerminal, soundActive, onToggleSound }) {
+export default function Navbar({ onOpenResume, onOpenTerminal, onToggleGame, isGameActive, soundActive, onToggleSound }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,23 +42,24 @@ export default function Navbar({ onOpenResume, onOpenTerminal, soundActive, onTo
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         
-        {/* Brand / Monogram */}
+        {/* Brand / Portrait Monogram */}
         <a 
           href="#hero" 
           onClick={(e) => { e.preventDefault(); handleNavClick('#hero'); }}
           className="group flex items-center gap-3 cursor-pointer"
         >
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-400/40 transition-all duration-300">
-            <div className="w-full h-full bg-[#07090e] rounded-[10px] flex items-center justify-center">
-              <span className="font-extrabold text-sm tracking-wider bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                AR
-              </span>
-            </div>
+          <div className="relative flex items-center justify-center w-11 h-11 rounded-full p-[2px] bg-gradient-to-tr from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] shadow-lg shadow-[var(--primary)]/30 group-hover:scale-105 transition-all duration-300">
+            <img 
+              src={profileImageBase64} 
+              alt="Abdul Rafey" 
+              className="w-full h-full object-cover rounded-full"
+            />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#07090e]"></span>
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-sm tracking-tight text-white flex items-center gap-2">
+            <span className="font-extrabold text-sm tracking-tight text-white flex items-center gap-2">
               Abdul Rafey
-              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800/40">
+              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-700/50">
                 24L-0043
               </span>
             </span>
@@ -79,7 +81,24 @@ export default function Navbar({ onOpenResume, onOpenTerminal, soundActive, onTo
         </nav>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Game Mode Launcher */}
+          <button
+            onClick={() => {
+              sound.playWhoosh();
+              onToggleGame();
+            }}
+            title="Launch Interactive Cyber 4D Game"
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold rounded-lg border transition-all shadow-md cursor-pointer ${
+              isGameActive 
+                ? 'bg-[var(--primary)] text-slate-950 border-white font-extrabold shadow-[var(--primary)]/50 scale-105' 
+                : 'bg-slate-800/90 hover:bg-slate-700 text-[var(--primary)] border-[var(--primary)]/40'
+            }`}
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{isGameActive ? 'Exit Game' : 'Game Mode'}</span>
+          </button>
+
           {/* Terminal Launcher */}
           <button
             onClick={() => {
